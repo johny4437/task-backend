@@ -1,14 +1,18 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
+const consign = require('consign')
+const morgan =  require('morgan')
 require('dotenv').config()
 
-const route = require('./routes')
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}))
+
+consign()
+.include('./config/passport.js')
+    .then('./config/middlewares.js')
+    .then('./api')
+    .then('./config/routes.js')
+    .into(app)
 
 
-app.use(route)
 
 const PORT = process.env.PORT || 3300;
 app.listen(PORT, ()=>{
