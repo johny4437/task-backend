@@ -7,7 +7,6 @@ module.exports = app =>{
         const date = req.query.date ? req.query.date 
         : moment().endOf('day').toDate();
         
-        console.log(req.user.id)
         await knex('tasks')
                 .where({userId:req.user.id})
                 .where('estimateAt','<=', date)
@@ -38,10 +37,26 @@ module.exports = app =>{
     }
     const updateTaskDoneAt = async (req, res, doneAt) =>{
         await knex('tasks')
-        .where({id:req.params.id, userId:req.user.id, })
+        .where({id:req.params.id, userId:req.user.id })
         .update({doneAt})
         .then(()=>res.status(200).json('tarefa atualizada'))
-        .catch(e=>res.status(500).json(e))
+        .catch(e=>res.status(500).json(e));   
     }
-    return{ getTasks, remove, updateTaskDoneAt, save}
+
+    const toggleTask = async (req, res) =>{
+        await knex('tasks')
+        .where({id:req.params.id, userId:req.user.id })
+        .first()
+        .then(task=>{
+            if(!task){
+                const msg =  `Task com ${req.params.id} não existe`;
+                res.status(400).send(msg)
+            }
+            const doneAt = task.doneAt ? null : new Date();
+            updateTaskDoneAt(req,res, doneAt)
+        })
+        .catch(e=>res.status(500).json(e)); 
+    }
+
+    return{ getTasks, remove, toggleTask, save}
 }

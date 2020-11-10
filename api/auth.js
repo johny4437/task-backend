@@ -5,7 +5,6 @@ const knex = require('../config/db')
 module.exports = app =>{
     const singin = async(req, res) =>{
         const { email, password } = req.body;
-        console.log(req.body)
         if(email !== "" && password !== "" ){
             const user  = await knex('users').select('*').where('email', email);
             if(user.length === 0 ){
